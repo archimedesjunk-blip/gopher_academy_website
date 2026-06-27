@@ -16,7 +16,7 @@ export function Hero() {
 
   return (
     <section ref={ref} className="relative min-h-[100dvh] overflow-hidden px-6 pt-16 md:pt-20">
-      <div className="mx-auto max-w-6xl pt-10 md:pt-20">
+      <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
           <motion.p {...rise(0)} className="mb-6 font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
             Vineyard &amp; estate gopher control

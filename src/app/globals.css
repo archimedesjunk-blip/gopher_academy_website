@@ -13,6 +13,11 @@
   --color-grass-light: #7DB587;
   --color-grass-dark: #37614E;
   --color-soil: #7A5C46;
+  --color-soil-dark: #5E4636;
+  --color-root: #D8C29C;
+  --color-gopher: #B0865A;
+  --color-gopher-light: #D9BD93;
+  --color-gopher-dark: #5E4226;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }

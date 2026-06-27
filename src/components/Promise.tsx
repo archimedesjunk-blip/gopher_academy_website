@@ -1,19 +1,21 @@
 import { Section } from "./Section";
 import { Reveal } from "./Reveal";
 
-const items = ["Licensed and insured", "Discreet, scheduled crews", "Season guarantee"];
+const items = ["Safe for pets, kids, and gardens", "No poison in the food chain", "Mechanical traps only"];
 
 export function PromiseSection() {
   return (
-    <Section id="promise" className="border-t border-hairline">
+    <Section id="promise" eyebrow="Poison-free" className="border-t border-hairline">
       <Reveal>
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-medium leading-tight tracking-tight text-ink md:text-5xl">
-            Gone. And they stay gone.
+            We trap gophers. We don&apos;t poison your yard.
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted">
-            If activity returns to a treated block within the season, so do we, at no charge. No long contracts, no broadcast
-            poison near your fruit. Just quiet ground.
+            Most gopher control leans on poison bait or gas cartridges. We do not use any of it. Gopher Academy works
+            with spring traps and nothing else, set right in the active tunnels. That means nothing toxic sitting in your
+            soil, nothing in the food chain for a dog or a curious kid to find, and gophers that are caught and removed
+            instead of left underground.
           </p>
         </div>
       </Reveal>

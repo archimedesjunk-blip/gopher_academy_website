@@ -1,5 +1,5 @@
-// Only the fields the validator checks. Other form fields (estate, phone,
-// acreage, message) are posted and logged server-side but need no validation.
+// Only the fields the validator checks. Other form fields (phone, location,
+// message) are posted and logged server-side but need no validation.
 export type ConsultInput = {
   name: string;
   email: string;

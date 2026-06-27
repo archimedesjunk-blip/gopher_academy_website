@@ -23,7 +23,7 @@ This plan was produced with the `design-taste-frontend` skill (redesign protocol
 - **Fonts:** Geist (sans) + Geist Mono via the `geist` package. No `<link>` to Google Fonts. No Inter.
 - **Animation:** `import { motion, useReducedMotion } from "motion/react"`. Any motion honors `prefers-reduced-motion`. No `window.addEventListener('scroll')`.
 - **Icons:** `@phosphor-icons/react` only. No hand-rolled SVG icon paths. One family.
-- **Page theme:** Light-locked (Estate Editorial intent). A minimal `prefers-color-scheme: dark` token fallback is provided so the page is not blinding in dark, but the design target is the light theme. No section inverts mid-page.
+- **Page theme:** Light-locked (Estate Editorial intent), unconditionally — no `prefers-color-scheme: dark` variant. The brand logo is dark line-art that only reads on a light background, so the page must always render light. No section inverts mid-page.
 - **Locked palette (one accent, used identically everywhere):**
   - `--bg: #F5F6F4` (cool off-white) · `--surface: #FFFFFF`
   - `--ink: #1C1F1D` (off-black) · `--muted: #5B635E` (slate-green-grey)
@@ -137,21 +137,9 @@ export default config;
 }
 
 :root {
+  /* Light-locked: the brand logo is dark line-art that only reads on a light
+     background, and the chosen design is the off-white estate look. No dark variant. */
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  /* Minimal not-blinding fallback; light is the design target. */
-  :root {
-    --color-bg: #16181A;
-    --color-surface: #1E2123;
-    --color-ink: #E7E9E6;
-    --color-muted: #A2ABA5;
-    --color-hairline: #2C312E;
-    --color-accent: #6E9C86;
-    --color-accent-hover: #84B19B;
-    --color-on-accent: #14181A;
-  }
 }
 
 body {

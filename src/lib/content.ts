@@ -15,10 +15,11 @@ export const content = {
   ],
   serviceArea: "Serving Napa, Sonoma & the North Coast", // TODO: confirm real region
   phone: "(707) 000-0000", // TODO: real number
+  // TODO: replace with real, permissioned testimonials before publishing (these are placeholders)
   testimonials: [
     {
       quote:
-        "They walked every block, found runs we'd missed for two seasons, and the mounds were gone in a week. No theatrics, no poison near the vines.",
+        "They walked every block, found runs we'd missed for two seasons, and the mounds were gone in a week. No poison near the vines.",
       name: "Marisol Vega",
       role: "Estate Manager",
       estate: "Tierra Alta Vineyards",

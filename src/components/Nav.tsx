@@ -25,12 +25,12 @@ export function Nav() {
             {content.cta.label}
           </a>
         </div>
-        <button type="button" className="md:hidden" aria-label="Menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <button type="button" className="md:hidden" aria-label="Menu" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <List size={24} />}
         </button>
       </nav>
       {open && (
-        <div className="flex flex-col gap-4 border-t border-hairline px-6 py-6 md:hidden">
+        <div id="mobile-menu" className="flex flex-col gap-4 border-t border-hairline px-6 py-6 md:hidden">
           {content.nav.map((i) => (
             <a key={i.href} href={i.href} className="text-muted" onClick={() => setOpen(false)}>
               {i.label}

@@ -58,8 +58,8 @@ export function Consult() {
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="name" className={label}>Name</label>
-              <input id="name" name="name" className={field} placeholder="Your name" />
-              {errors.name && <p className="mt-1.5 text-sm text-accent">{errors.name}</p>}
+              <input id="name" name="name" className={field} placeholder="Your name" aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-error" : undefined} />
+              {errors.name && <p id="name-error" role="alert" className="mt-1.5 text-sm text-accent">{errors.name}</p>}
             </div>
             <div>
               <label htmlFor="estate" className={label}>Estate / vineyard</label>
@@ -69,8 +69,8 @@ export function Consult() {
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="email" className={label}>Email</label>
-              <input id="email" name="email" type="email" className={field} placeholder="you@estate.com" />
-              {errors.email && <p className="mt-1.5 text-sm text-accent">{errors.email}</p>}
+              <input id="email" name="email" type="email" className={field} placeholder="you@estate.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} />
+              {errors.email && <p id="email-error" role="alert" className="mt-1.5 text-sm text-accent">{errors.email}</p>}
             </div>
             <div>
               <label htmlFor="phone" className={label}>Phone</label>
@@ -89,7 +89,7 @@ export function Consult() {
             <textarea id="message" name="message" rows={4} className={field} placeholder="Mounds, where, how long" />
           </div>
           {status === "error" && !errors.name && !errors.email && (
-            <p className="text-sm text-accent">Something went wrong. Please try again or call us.</p>
+            <p role="alert" className="text-sm text-accent">Something went wrong. Please try again or call us.</p>
           )}
           <button type="submit" disabled={status === "submitting"} className="justify-self-start rounded-full bg-accent px-7 py-3 font-medium text-on-accent transition-colors hover:bg-accent-hover active:scale-[0.98] disabled:opacity-60">
             {status === "submitting" ? "Sending..." : "Request a consultation"}

@@ -1,18 +1,23 @@
 "use client";
-import { motion, useReducedMotion } from "motion/react";
+import { useRef } from "react";
+import { motion, useScroll, useReducedMotion } from "motion/react";
 import { content } from "@/lib/content";
+import { GrassGround } from "./GrassGround";
 
 export function Hero() {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+
   const rise = (delay: number) =>
     reduce
       ? { initial: false }
       : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] as const } };
 
   return (
-    <section className="px-6 pt-16 md:pt-20">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 pb-20 md:grid-cols-[1.05fr_0.95fr] md:gap-16 md:pb-28">
-        <div>
+    <section ref={ref} className="relative min-h-[100dvh] overflow-hidden px-6 pt-16 md:pt-20">
+      <div className="mx-auto max-w-6xl pt-10 md:pt-20">
+        <div className="max-w-2xl">
           <motion.p {...rise(0)} className="mb-6 font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
             Vineyard &amp; estate gopher control
           </motion.p>
@@ -31,15 +36,8 @@ export function Hero() {
             </a>
           </motion.div>
         </div>
-        <motion.div {...rise(0.2)} className="relative aspect-[4/5] overflow-hidden rounded-xl border border-hairline">
-          {/* TODO: real photo - vineyard rows, cool tones, golden hour */}
-          <img
-            src="https://picsum.photos/seed/vineyard-rows-coast/900/1125"
-            alt="Vineyard rows at a coastal estate"
-            className="h-full w-full object-cover"
-          />
-        </motion.div>
       </div>
+      <GrassGround progress={scrollYProgress} />
     </section>
   );
 }

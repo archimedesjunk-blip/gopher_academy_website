@@ -9,6 +9,10 @@
   --color-accent: #37614E;
   --color-accent-hover: #2C5040;
   --color-on-accent: #F5F6F4;
+  --color-grass: #4E8B5E;
+  --color-grass-light: #7DB587;
+  --color-grass-dark: #37614E;
+  --color-soil: #7A5C46;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
@@ -26,6 +30,19 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+@keyframes grass-sway {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50%      { transform: rotate(2.2deg); }
+}
+
+.grass-blade {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: grass-sway 3.6s ease-in-out infinite;
+  animation-delay: var(--sway-delay, 0s);
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

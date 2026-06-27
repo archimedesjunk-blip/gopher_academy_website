@@ -1,10 +1,8 @@
+// Only the fields the validator checks. Other form fields (estate, phone,
+// acreage, message) are posted and logged server-side but need no validation.
 export type ConsultInput = {
   name: string;
-  estate: string;
   email: string;
-  phone: string;
-  acreage: string;
-  message: string;
 };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

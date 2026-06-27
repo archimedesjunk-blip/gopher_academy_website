@@ -29,7 +29,7 @@ const SOIL_TOP =
   `Q ${f(W * 0.62)} ${GROUND - 10} ${f(W * 0.75)} ${GROUND} ` +
   `Q ${f(W * 0.87)} ${GROUND - 6} ${W} ${GROUND}`;
 
-type Blade = { i: number; d: string; fill: string; tipY: number; h: number; start: number; end: number; delay: string };
+type Blade = { i: number; d: string; fill: string; h: number; start: number; end: number; delay: string };
 
 const blades: Blade[] = Array.from({ length: BLADES }, (_, i) => {
   const r1 = rand(i);
@@ -48,7 +48,7 @@ const blades: Blade[] = Array.from({ length: BLADES }, (_, i) => {
     `M ${f(x - w)} ${GROUND} ` +
     `C ${f(x - w + lean * 0.5)} ${f(GROUND - h * 0.4)} ${f(x + lean - w * 0.5)} ${f(GROUND - h * 0.82)} ${f(x + lean)} ${f(tipY)} ` +
     `C ${f(x + lean + w * 0.3)} ${f(GROUND - h * 0.7)} ${f(x + w + lean * 0.5)} ${f(GROUND - h * 0.35)} ${f(x + w)} ${GROUND} Z`;
-  return { i, d, fill, tipY, h, start, end, delay: (r2 * 1.8).toFixed(2) };
+  return { i, d, fill, h, start, end, delay: (r2 * 1.8).toFixed(2) };
 });
 
 // Static soil texture: small spec stones scattered below the front lip so the
@@ -86,23 +86,17 @@ const roots: Root[] = Array.from({ length: ROOTS }, (_, j) => {
 });
 
 function GrassBlade({ b, progress, grown }: { b: Blade; progress: MotionValue<number>; grown: boolean }) {
-  // Grow by revealing the (undistorted) blade through a rectangular clip window
-  // that scales up from the soil line — the mirror of how roots draw downward.
-  // The blade path never scales, so its curve keeps its shape the whole way up.
-  const reveal = useTransform(progress, [b.start, b.end], [0, 1], { clamp: true });
-  const clipId = `blade-${b.i}`;
+  // Grow by sliding the whole (undistorted) blade up out of the soil: it starts
+  // a full blade-height below the ground line and rises into place, tip first.
+  // The blade layer is clipped at the ground line, so the part still underground
+  // (and the flat bottom edge) stays hidden behind the dirt lip. No squash, no
+  // wipe — it reads like a real sprout pushing up.
+  // Round the start offset to a whole pixel so the SSR transform string matches
+  // the client's (Math.sin floats differ in their last digits -> hydration).
+  const ty = useTransform(progress, [b.start, b.end], [Math.round(b.h), 0], { clamp: true });
   return (
     <g className="grass-blade" style={{ "--sway-delay": `${b.delay}s` } as React.CSSProperties}>
-      <clipPath id={clipId}>
-        <motion.rect
-          x={0}
-          y={f(b.tipY)}
-          width={W}
-          height={f(b.h)}
-          style={{ scaleY: grown ? 1 : reveal, transformBox: "fill-box", transformOrigin: "bottom center" }}
-        />
-      </clipPath>
-      <path d={b.d} fill={b.fill} clipPath={`url(#${clipId})`} />
+      <motion.path d={b.d} fill={b.fill} style={{ y: grown ? 0 : ty }} />
     </g>
   );
 }
@@ -165,8 +159,9 @@ export function GrassGround({ progress }: { progress: MotionValue<number> }) {
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0" aria-hidden>
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block h-[36vh] max-h-[330px] min-h-[230px] w-full">
         <defs>
-          {/* clip the gopher to above the soil line so it hides in its hole */}
-          <clipPath id="gopher-clip">
+          {/* everything above the soil line; hides emerging blade bases and the
+              gopher's body until they rise out of the hole */}
+          <clipPath id="above-soil">
             <rect x={0} y={-H} width={W} height={GROUND + H} />
           </clipPath>
         </defs>
@@ -180,14 +175,16 @@ export function GrassGround({ progress }: { progress: MotionValue<number> }) {
         {roots.map((r) => (
           <RootStrand key={r.j} r={r} progress={progress} grown={grown} />
         ))}
-        {/* blades */}
-        {blades.map((b) => (
-          <GrassBlade key={b.i} b={b} progress={progress} grown={grown} />
-        ))}
+        {/* blades rise up out of the soil, clipped at the ground line */}
+        <g clipPath="url(#above-soil)">
+          {blades.map((b) => (
+            <GrassBlade key={b.i} b={b} progress={progress} grown={grown} />
+          ))}
+        </g>
         {/* darker front dirt lip: grass blades and roots sprout from behind it */}
         <path d={`${SOIL_TOP} L ${W} ${LIP} L 0 ${LIP} Z`} fill="var(--color-soil-dark)" />
         {/* gopher pops up in front of the grass, clipped to the soil line */}
-        <g clipPath="url(#gopher-clip)">
+        <g clipPath="url(#above-soil)">
           <Gopher cx={W * 0.64} progress={progress} grown={grown} />
         </g>
       </svg>

@@ -2,7 +2,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { Stakes } from "@/components/Stakes";
-import { Promise } from "@/components/Promise";
+import { PromiseSection } from "@/components/Promise";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
       <main id="top">
         <Hero />
         <Stakes />
-        <Promise />
+        <PromiseSection />
         {/* sections added in Tasks 5-7 */}
       </main>
       <Footer />

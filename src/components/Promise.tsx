@@ -3,7 +3,7 @@ import { Reveal } from "./Reveal";
 
 const items = ["Licensed and insured", "Discreet, scheduled crews", "Season guarantee"];
 
-export function Promise() {
+export function PromiseSection() {
   return (
     <Section id="promise" className="border-t border-hairline">
       <Reveal>

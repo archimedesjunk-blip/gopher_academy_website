@@ -17,7 +17,17 @@ const W = 1200;
 const H = 330;
 const GROUND = 140; // soil line: blades root here and grow up, roots grow down
 const BLADES = 60;
-const ROOTS = 15;
+const ROOTS = 20;
+const LIP = GROUND + 16; // depth of the darker front dirt lip
+
+// Soil surface: gentle upward-only mounds, shared by the back soil and the
+// front lip so the two line up exactly.
+const SOIL_TOP =
+  `M0 ${GROUND} ` +
+  `Q ${f(W * 0.12)} ${GROUND - 9} ${f(W * 0.25)} ${GROUND} ` +
+  `Q ${f(W * 0.37)} ${GROUND - 6} ${f(W * 0.5)} ${GROUND} ` +
+  `Q ${f(W * 0.62)} ${GROUND - 10} ${f(W * 0.75)} ${GROUND} ` +
+  `Q ${f(W * 0.87)} ${GROUND - 6} ${W} ${GROUND}`;
 
 type Blade = { i: number; d: string; fill: string; start: number; end: number; delay: string };
 
@@ -41,30 +51,26 @@ const blades: Blade[] = Array.from({ length: BLADES }, (_, i) => {
   return { i, d, fill, start, end, delay: (r2 * 1.8).toFixed(2) };
 });
 
-type Root = { j: number; taproot: string; branch1: string; branch2: string; start: number; end: number };
+type Root = { j: number; main: string; branch1: string; branch2: string; start: number; end: number };
 
+// Open centerline paths defined top (surface) -> down, so animating pathLength
+// 0 -> 1 draws the tip reaching downward (a real "growing" feel, not a stretch).
 const roots: Root[] = Array.from({ length: ROOTS }, (_, j) => {
   const rx = ((j + 0.5) / ROOTS) * W + (rand(j + 11) - 0.5) * 26;
   const rlen = 90 + rand(j + 33) * 120;
-  const sway = (rand(j + 57) - 0.5) * 72;
-  const tw = 6 + rand(j + 5) * 4; // top half-width, tapers to a point
+  const sway = (rand(j + 57) - 0.5) * 74;
   const tipX = rx + sway;
   const tipY = GROUND + rlen;
-  // Tapered taproot: a filled shape, wide at the surface narrowing to the tip.
-  const taproot =
-    `M ${f(rx - tw)} ${GROUND} ` +
-    `C ${f(rx - tw + sway * 0.3)} ${f(GROUND + rlen * 0.4)} ${f(tipX - 2)} ${f(GROUND + rlen * 0.8)} ${f(tipX)} ${f(tipY)} ` +
-    `C ${f(tipX + 2)} ${f(GROUND + rlen * 0.8)} ${f(rx + tw + sway * 0.3)} ${f(GROUND + rlen * 0.4)} ${f(rx + tw)} ${GROUND} Z`;
-  // two thin tendrils branching off the taproot
-  const b1x = rx + sway * 0.35;
-  const b1y = GROUND + rlen * 0.38;
-  const branch1 = `M ${f(b1x)} ${f(b1y)} C ${f(b1x - 18)} ${f(b1y + 12)} ${f(b1x - 26)} ${f(b1y + 30)} ${f(b1x - 32)} ${f(b1y + 50)}`;
-  const b2x = rx + sway * 0.6;
-  const b2y = GROUND + rlen * 0.62;
-  const branch2 = `M ${f(b2x)} ${f(b2y)} C ${f(b2x + 16)} ${f(b2y + 10)} ${f(b2x + 24)} ${f(b2y + 26)} ${f(b2x + 30)} ${f(b2y + 46)}`;
-  const start = 0.38 + rand(j + 71) * 0.26; // grow through the later scroll
-  const end = Math.min(start + 0.42, 1);
-  return { j, taproot, branch1, branch2, start, end };
+  const main = `M ${f(rx)} ${GROUND} C ${f(rx + sway * 0.25)} ${f(GROUND + rlen * 0.35)} ${f(tipX - 3)} ${f(GROUND + rlen * 0.72)} ${f(tipX)} ${f(tipY)}`;
+  const b1x = rx + sway * 0.3;
+  const b1y = GROUND + rlen * 0.4;
+  const branch1 = `M ${f(b1x)} ${f(b1y)} C ${f(b1x - 14)} ${f(b1y + 14)} ${f(b1x - 22)} ${f(b1y + 30)} ${f(b1x - 26)} ${f(b1y + 48)}`;
+  const b2x = rx + sway * 0.55;
+  const b2y = GROUND + rlen * 0.6;
+  const branch2 = `M ${f(b2x)} ${f(b2y)} C ${f(b2x + 14)} ${f(b2y + 12)} ${f(b2x + 22)} ${f(b2y + 28)} ${f(b2x + 26)} ${f(b2y + 44)}`;
+  const start = 0.34 + rand(j + 71) * 0.26;
+  const end = Math.min(start + 0.46, 1);
+  return { j, main, branch1, branch2, start, end };
 });
 
 function GrassBlade({ b, progress, grown }: { b: Blade; progress: MotionValue<number>; grown: boolean }) {
@@ -81,13 +87,18 @@ function GrassBlade({ b, progress, grown }: { b: Blade; progress: MotionValue<nu
 }
 
 function RootStrand({ r, progress, grown }: { r: Root; progress: MotionValue<number>; grown: boolean }) {
-  const scaleY = useTransform(progress, [r.start, r.end], [0, 1], { clamp: true });
+  const span = r.end - r.start;
+  // The taproot draws first; the branches sprout a little later, so the root
+  // reaches down and then puts out tendrils.
+  const mainPL = useTransform(progress, [r.start, r.start + span * 0.6], [0, 1], { clamp: true });
+  const b1PL = useTransform(progress, [r.start + span * 0.4, r.start + span * 0.85], [0, 1], { clamp: true });
+  const b2PL = useTransform(progress, [r.start + span * 0.55, r.end], [0, 1], { clamp: true });
   return (
-    <motion.g style={{ scaleY: grown ? 1 : scaleY, transformBox: "fill-box", transformOrigin: "top center" }}>
-      <path d={r.taproot} fill="var(--color-root)" />
-      <path d={r.branch1} fill="none" stroke="var(--color-root)" strokeWidth={2.5} strokeLinecap="round" />
-      <path d={r.branch2} fill="none" stroke="var(--color-root)" strokeWidth={2.5} strokeLinecap="round" />
-    </motion.g>
+    <g fill="none" stroke="var(--color-root)" strokeLinecap="butt">
+      <motion.path d={r.main} strokeWidth={5} style={{ pathLength: grown ? 1 : mainPL }} />
+      <motion.path d={r.branch1} strokeWidth={3} style={{ pathLength: grown ? 1 : b1PL }} />
+      <motion.path d={r.branch2} strokeWidth={3} style={{ pathLength: grown ? 1 : b2PL }} />
+    </g>
   );
 }
 
@@ -138,20 +149,9 @@ export function GrassGround({ progress }: { progress: MotionValue<number> }) {
             <rect x={0} y={-H} width={W} height={GROUND + H} />
           </clipPath>
         </defs>
-        {/* soil: a gently mounded top that never dips below the ground line, so
-            there is no gap under the grass roots or the gopher */}
-        <path
-          d={
-            `M0 ${GROUND} ` +
-            `Q ${f(W * 0.12)} ${GROUND - 9} ${f(W * 0.25)} ${GROUND} ` +
-            `Q ${f(W * 0.37)} ${GROUND - 6} ${f(W * 0.5)} ${GROUND} ` +
-            `Q ${f(W * 0.62)} ${GROUND - 10} ${f(W * 0.75)} ${GROUND} ` +
-            `Q ${f(W * 0.87)} ${GROUND - 6} ${W} ${GROUND} ` +
-            `L ${W} ${H} L 0 ${H} Z`
-          }
-          fill="var(--color-soil)"
-        />
-        {/* roots reach down into the soil */}
+        {/* soil: mounded top that never dips below the ground line */}
+        <path d={`${SOIL_TOP} L ${W} ${H} L 0 ${H} Z`} fill="var(--color-soil)" />
+        {/* roots draw downward into the soil */}
         {roots.map((r) => (
           <RootStrand key={r.j} r={r} progress={progress} grown={grown} />
         ))}
@@ -159,6 +159,8 @@ export function GrassGround({ progress }: { progress: MotionValue<number> }) {
         {blades.map((b) => (
           <GrassBlade key={b.i} b={b} progress={progress} grown={grown} />
         ))}
+        {/* darker front dirt lip: grass blades and roots sprout from behind it */}
+        <path d={`${SOIL_TOP} L ${W} ${LIP} L 0 ${LIP} Z`} fill="var(--color-soil-dark)" />
         {/* gopher pops up in front of the grass, clipped to the soil line */}
         <g clipPath="url(#gopher-clip)">
           <Gopher cx={W * 0.64} progress={progress} grown={grown} />

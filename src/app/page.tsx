@@ -5,6 +5,8 @@ import { Stakes } from "@/components/Stakes";
 import { PromiseSection } from "@/components/Promise";
 import { Methods } from "@/components/Methods";
 import { Pricing } from "@/components/Pricing";
+import { Proof } from "@/components/Proof";
+import { About } from "@/components/About";
 
 export default function Home() {
   return (
@@ -16,7 +18,8 @@ export default function Home() {
         <PromiseSection />
         <Methods />
         <Pricing />
-        {/* sections added in Tasks 6-7 */}
+        <Proof />
+        <About />
       </main>
       <Footer />
     </>

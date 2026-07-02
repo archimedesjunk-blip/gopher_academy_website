@@ -17,7 +17,7 @@ export const content = {
   cta: { label: "Request a free quote", href: "#consult" },
   serviceArea: "Serving Sonoma County, California",
   email: "hello@gopheracademy.biz", // TODO: confirm the real inbox with Archie before launch
-  phone: "(707) 555-0123", // TODO: PLACEHOLDER. Swap for the real number before launch.
+  phone: "(707) 555-0123", // TODO: PLACEHOLDER. Swap for the real number before launch. Use the 10-digit US number only, no leading 1 or +1 (the tel: link below adds it).
   insuredLine: "Insured", // rendered only when flags.showInsuredLine is true
   testimonials: [] as Testimonial[], // real quotes from the post-service survey only. NEVER invent one.
   flags: {

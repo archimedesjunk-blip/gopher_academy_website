@@ -7,6 +7,8 @@ import { Methods } from "@/components/Methods";
 import { Pricing } from "@/components/Pricing";
 import { About } from "@/components/About";
 import { Consult } from "@/components/Consult";
+import { BeforeAfter } from "@/components/BeforeAfter";
+import { Testimonials } from "@/components/Testimonials";
 
 export default function Home() {
   return (
@@ -17,8 +19,10 @@ export default function Home() {
         <PromiseSection />
         <Stakes />
         <Methods />
+        <BeforeAfter />
         <Pricing />
         <About />
+        <Testimonials />
         <Consult />
       </main>
       <Footer />

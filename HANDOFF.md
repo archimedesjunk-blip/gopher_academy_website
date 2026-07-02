@@ -63,10 +63,13 @@ Scripts: `npm run dev` | `build` | `start` | `lint` | `test`.
 Page section order is set in `src/app/page.tsx`:
 
 `Hero → PromiseSection (poison-free) → Stakes (the problem) → Methods (how it
-works) → Pricing (quote-based) → About → Consult (quote form) → Footer`
+works) → BeforeAfter (flag-off, renders nothing) → Pricing (quote-based) →
+About → Testimonials (flag-off, renders nothing) → Consult (quote form) →
+Footer`
 
 - `src/lib/content.ts` — shared copy: nav, CTA label/href, service area,
-  email. **`email` is a placeholder** (`hello@gopheracademy.biz`).
+  email, phone, the `flags` layer, and `testimonials`. **`email` and `phone`
+  are placeholders.** See "Flags layer" below.
 - `src/components/Hero.tsx` — `"use client"`. Mount intro animation (`rise()`
   helper, opacity/y), `useScroll` on the section, renders `<GrassGround>`.
 - `src/components/GrassGround.tsx` — the cartoon SVG hero animation (see
@@ -77,7 +80,31 @@ works) → Pricing (quote-based) → About → Consult (quote form) → Footer`
   `console.log`s the submission.** Not wired to email/CRM yet.
 - `src/lib/validateConsult.ts` (+ `.test.ts`) — validates name + email only.
 - `Section.tsx` (wrapper + eyebrow), `Reveal.tsx` (scroll-in fade),
-  `Nav.tsx`, `Footer.tsx`, `Stakes/Promise/Methods/Pricing/About.tsx`.
+  `Nav.tsx`, `Footer.tsx`, `Stakes/Promise/Methods/Pricing/About.tsx`,
+  `Testimonials.tsx` (flag-gated), `BeforeAfter.tsx` (flag-gated).
+
+## Flags layer (`src/lib/content.ts`)
+
+`src/lib/content.ts` is the single owner-editable file for contact info,
+flags, and testimonials. `content.flags` gates copy that must not appear
+until it is true:
+
+- `showPhone`: the placeholder phone number is intentionally visible
+  pre-launch; swap `content.phone` for the real number before launch.
+- `showTestimonials`: stays `false`, and `Testimonials.tsx` renders `null`,
+  until real quotes from the post-service survey are added to
+  `content.testimonials` (never invent one).
+- `showBeforeAfter`: stays `false`, and `BeforeAfter.tsx` renders `null`,
+  until real photos exist at `public/photos/before-1.jpg` and
+  `public/photos/after-1.jpg` (see `public/photos/README.txt`).
+- `showInsuredLine`: stays `false` until liability insurance is actually in
+  force (hard constraint, see below).
+
+Nothing fake renders while a flag is off: both `Testimonials` and
+`BeforeAfter` are server components whose first line of logic is the flag
+(and, for testimonials, empty-data) check. Nav links for `#testimonials` and
+`#results` can be added to `content.nav` once their flags flip; both
+sections are reachable by scroll in the meantime.
 
 ## The grass animation (GrassGround.tsx) — read before touching
 
@@ -146,11 +173,19 @@ launch, confirm with the owner (Archie):
 
 1. **Where quote submissions should go.** `/api/consult` currently only
    `console.log`s. Needs wiring to email/CRM (Resend, Formspree, SMTP) and a
-   real inbox (`content.ts` `email` is a placeholder).
-2. **Insurance status.** If/when insurance is in force, one "insured" line
-   may be added — until then it stays off entirely (hard constraint above).
-3. Optional later: drop in real testimonials from the post-service survey
-   (none may be invented).
+   real inbox.
+2. **Phone and email are both placeholders in `content.ts`.** Swap
+   `content.phone` and `content.email` for the real values before launch.
+3. **Real photos needed for BeforeAfter.** Drop `before-1.jpg` and
+   `after-1.jpg` into `public/photos/`, then flip `flags.showBeforeAfter`.
+   The section renders nothing until then.
+4. **Real survey quotes needed for Testimonials.** Add real quotes from the
+   post-service survey to `content.testimonials`, then flip
+   `flags.showTestimonials`. None may be invented; the section renders
+   nothing until then.
+5. **Insurance status.** If/when insurance is in force, flip
+   `flags.showInsuredLine` to add the "insured" line, until then it stays
+   off entirely (hard constraint above).
 
 No work is mid-flight; the last session ended on a clean, pushed state.
 Recent visual iteration was all on the grass animation — if the user wants
